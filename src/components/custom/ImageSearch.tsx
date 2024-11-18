@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
@@ -8,21 +7,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ImageModel } from "@/models/ImageModel";
 import { ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-
-interface IPicsumImage {
-  id: string;
-  author: string;
-  width: number;
-  height: number;
-  url: string;
-  download_url: string;
-}
+import { FocusCards } from "../ui/focus-cards";
+import HyperText from "../ui/hyper-text";
 
 export default function ImageComponent() {
-  const [images, setImages] = useState<IPicsumImage[]>([]);
+  const [images, setImages] = useState<ImageModel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -39,7 +31,8 @@ export default function ImageComponent() {
         );
         if (!response.ok) throw new Error("Failed to fetch images");
         const data = await response.json();
-        setImages(data);
+        const modeledData = ImageModel.mapImages(data);
+        setImages(modeledData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -65,42 +58,19 @@ export default function ImageComponent() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-center text-4xl font-bold">Picsum Gallery</h1>
+      <div className="flex items-center justify-center">
+        <HyperText
+          className="mb-8 text-center text-5xl font-bold text-black dark:text-white"
+          text="Picsum Gallery"
+        />
+      </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {loading
-          ? Array.from({ length: imagesPerPage }).map((_, index) => (
-              <Card key={index} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="relative aspect-square w-full">
-                    <Skeleton className="absolute inset-0" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          : images.map((image) => (
-              <Card
-                key={image.id}
-                className="overflow-hidden transition-transform hover:scale-105"
-              >
-                <CardContent className="p-0">
-                  <div className="relative aspect-square w-full">
-                    <img
-                      src={`https://picsum.photos/id/${image.id}/400/400`}
-                      alt={`Photo by ${image.author}`}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                      <p className="text-sm text-white">
-                        Photo by{" "}
-                        <span className="font-semibold">{image.author}</span>
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <FocusCards
+          images={images}
+          imagesPerPage={imagesPerPage}
+          loading={loading}
+        />
       </div>
 
       {!loading && (
