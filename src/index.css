@@ -62,5 +62,26 @@
   }
   body {
     @apply bg-background text-foreground;
+
+    overflow-x: hidden;
+
+    /* scrollbar */
+
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Track */
+    &::-webkit-scrollbar-track {
+      border-radius: 10px;
+      background: linear-gradient(to bottom right, #f3f4f6, #ebf8ff, #e5e7eb);
+    }
+
+    /* Handle */
+    &::-webkit-scrollbar-thumb {
+      background: #c5c5c591;
+      border-radius: 10px;
+      max-height: 20px !important;
+    }
   }
 }
